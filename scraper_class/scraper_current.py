@@ -40,15 +40,26 @@ class Scraper:
         time.sleep(3)
         where = driver.find_element('xpath',
                             '//*[@id="text-input-where"]')
-        time.sleep(6)
-        where.send_keys(Keys.CONTROL + "a")
-        time.sleep(6)
-        where.send_keys(Keys.DELETE)
 
-        where.send_keys(Keys.CONTROL + 'a' + Keys.NULL, 'your string')
+        time.sleep(6)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(location)
         # driver.find_element('xpath',
         #                     '//*[@id="text-input-where"]').send_keys(Keys.CONTROL + "a", Keys.BACKSPACE, location)
-        time.sleep(3)
+        time.sleep(6)
         driver.find_element('xpath', '/html/body/div').click()
         time.sleep(3)
         try:
@@ -81,6 +92,9 @@ class Scraper:
         jobs_list = []
         for post in content.select('.job_seen_beacon'):
             # print("post start here ====>>   ", post)
+            l = post.select(".jcs-JobTitle")[0].get("href")
+
+            print("post", l)
             try:
                 data = {
                     "job_title": post.select('.jobTitle')[0].get_text().strip(),
@@ -89,6 +103,8 @@ class Scraper:
                     "location": post.select('.companyLocation')[0].get_text().strip(),
                     "date": post.select('.date')[0].get_text().strip(),
                     "job_desc": post.select('.job-snippet')[0].get_text().strip(),
+                    "url": post.select(".jcs-JobTitle")[0].get("href")
+
                 }
             except IndexError:
                 continue
@@ -97,12 +113,11 @@ class Scraper:
         length = len(pd.DataFrame(jobs_list))
 
         for x in range(length):
-
             scraped_data = {
                 "position": pd.DataFrame(jobs_list).iloc[x]['job_title'],
                 "location": " ".join(pd.DataFrame(jobs_list).iloc[x]['location'].split(" ")[:2]),
                 "company": pd.DataFrame(jobs_list).iloc[x]['company'],
-                "url": "www.indeed.com"
+                "url": f"www.indeed.com{pd.DataFrame(jobs_list).iloc[x]['url']}"
             }
 
             url = 'https://allscrapedjobs.herokuapp.com/api/v1/scraped_jobs/'
@@ -110,7 +125,7 @@ class Scraper:
             res = requests.post(url, json=scraped_data)
             time.sleep(3)
 
-            print(res.text)
+            return res.text
 
 
     def load_csv():
