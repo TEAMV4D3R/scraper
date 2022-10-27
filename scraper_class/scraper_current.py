@@ -12,6 +12,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
+import csv
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0", "Accept-Encoding": "gzip, deflate",
            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8", "DNT": "1", "Connection": "close", "Upgrade-Insecure-Requests": "1"}
@@ -33,17 +34,32 @@ class Scraper:
 
         driver.get(URL)
 
-        # page = driver.page_source
-        # driver.close()
-        # print(page)
-
         time.sleep(3)
         driver.find_element('xpath',
                             '//*[@id="text-input-what"]').send_keys(job_title)
         time.sleep(3)
-        driver.find_element('xpath',
-                            '//*[@id="text-input-where"]').send_keys(location)
-        time.sleep(3)
+        where = driver.find_element('xpath',
+                            '//*[@id="text-input-where"]')
+
+        time.sleep(6)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(Keys.BACK_SPACE)
+        where.send_keys(location)
+        # driver.find_element('xpath',
+        #                     '//*[@id="text-input-where"]').send_keys(Keys.CONTROL + "a", Keys.BACKSPACE, location)
+        time.sleep(6)
         driver.find_element('xpath', '/html/body/div').click()
         time.sleep(3)
         try:
@@ -57,11 +73,6 @@ class Scraper:
         return current_url
 
     def scrape_job_details(url):
-
-        # resp = requests.get(url, headers=HEADERS)
-        # content = BeautifulSoup(resp.content, "html.parser")
-
-        # print(content)
 
         URL = url
 
@@ -81,6 +92,9 @@ class Scraper:
         jobs_list = []
         for post in content.select('.job_seen_beacon'):
             # print("post start here ====>>   ", post)
+            l = post.select(".jcs-JobTitle")[0].get("href")
+
+            print("post", l)
             try:
                 data = {
                     "job_title": post.select('.jobTitle')[0].get_text().strip(),
@@ -89,6 +103,8 @@ class Scraper:
                     "location": post.select('.companyLocation')[0].get_text().strip(),
                     "date": post.select('.date')[0].get_text().strip(),
                     "job_desc": post.select('.job-snippet')[0].get_text().strip(),
+                    "url": post.select(".jcs-JobTitle")[0].get("href")
+
                 }
             except IndexError:
                 continue
@@ -97,60 +113,36 @@ class Scraper:
         length = len(pd.DataFrame(jobs_list))
 
         for x in range(length):
-
             scraped_data = {
                 "position": pd.DataFrame(jobs_list).iloc[x]['job_title'],
                 "location": " ".join(pd.DataFrame(jobs_list).iloc[x]['location'].split(" ")[:2]),
                 "company": pd.DataFrame(jobs_list).iloc[x]['company'],
-                "url": "www.indeed.com"
+                "url": f"www.indeed.com{pd.DataFrame(jobs_list).iloc[x]['url']}"
             }
 
             url = 'https://allscrapedjobs.herokuapp.com/api/v1/scraped_jobs/'
 
-            x = requests.post(url, json=scraped_data)
+            res = requests.post(url, json=scraped_data)
+            time.sleep(3)
 
-        return x.text
+            return res.text
+
+
+    def load_csv():
+        us_cities = []
+        file = open('us_cities.csv')
+        csvreader = csv.reader(file)
+        for row in csvreader:
+            us_cities.append(" ".join(row))
+        return us_cities
 
 
 if __name__ == "__main__":
+    s = Scraper
+    for city in s.load_csv():
+        print(city)
+        current_url = s.scrape_url_indeed(
+            'https://www.indeed.com/', 'Software', city)
+        df_ = s.scrape_job_details(current_url)
+        print(df_)
 
-    current_url = Scraper.scrape_url_indeed(
-        'https://www.indeed.com/', 'Software', 'Seattle, WA')
-    df_Seattle = Scraper.scrape_job_details(current_url)
-
-    current_url = Scraper.scrape_url_indeed(
-        'https://www.indeed.com/', 'Software', 'Portland, OR')
-    df_Portland = Scraper.scrape_job_details(current_url)
-
-    current_url = Scraper.scrape_url_indeed(
-        'https://www.indeed.com/', 'Software', 'Chicago, IL')
-    df_Chicago = Scraper.scrape_job_details(current_url)
-
-    current_url = Scraper.scrape_url_indeed(
-        'https://www.indeed.com/', 'Software', 'New York')
-    df_New_York = Scraper.scrape_job_details(current_url)
-
-    current_url = Scraper.scrape_url_indeed(
-        'https://www.indeed.com/', 'Software', 'San Francisco')
-    df_San_Francisco = Scraper.scrape_job_details(current_url)
-
-    current_url = Scraper.scrape_url_indeed(
-        'https://www.indeed.com/', 'Software', 'Los Angeles')
-    df_Los_Angeles = Scraper.scrape_job_details(current_url)
-
-    current_url = Scraper.scrape_url_indeed(
-        'https://www.indeed.com/', 'Software', 'Miami, FL')
-    df_Miami = Scraper.scrape_job_details(current_url)
-
-    current_url = Scraper.scrape_url_indeed(
-        'https://www.indeed.com/', 'Software', 'San Diego')
-    df_San_Diego = Scraper.scrape_job_details(current_url)
-
-    print(df_Seattle)
-    print(df_Portland)
-    print(df_Chicago)
-    print(df_New_York)
-    print(df_San_Francisco)
-    print(df_Los_Angeles)
-    print(df_Miami)
-    print(df_San_Diego)
