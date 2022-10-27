@@ -6,6 +6,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import time
+import requests
 import pandas as pd
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
@@ -92,25 +93,64 @@ class Scraper:
             except IndexError:
                 continue
             jobs_list.append(data)
-        dataframe = pd.DataFrame(jobs_list)
 
-        return dataframe
+        length = len(pd.DataFrame(jobs_list))
+
+        for x in range(length):
+
+            scraped_data = {
+                "position": pd.DataFrame(jobs_list).iloc[x]['job_title'],
+                "location": " ".join(pd.DataFrame(jobs_list).iloc[x]['location'].split(" ")[:2]),
+                "company": pd.DataFrame(jobs_list).iloc[x]['company'],
+                "url": "www.indeed.com"
+            }
+
+            url = 'https://allscrapedjobs.herokuapp.com/api/v1/scraped_jobs/'
+
+            x = requests.post(url, json=scraped_data)
+
+        return x.text
 
 
 if __name__ == "__main__":
 
     current_url = Scraper.scrape_url_indeed(
-        'https://www.indeed.com/', 'Software Developer', 'Seattle, WA')
+        'https://www.indeed.com/', 'Software', 'Seattle, WA')
     df_Seattle = Scraper.scrape_job_details(current_url)
 
     current_url = Scraper.scrape_url_indeed(
-        'https://www.indeed.com/', 'Software Developer', 'Portland, OR')
+        'https://www.indeed.com/', 'Software', 'Portland, OR')
     df_Portland = Scraper.scrape_job_details(current_url)
 
     current_url = Scraper.scrape_url_indeed(
-        'https://www.indeed.com/', 'Software Developer', 'Chicago, IL')
+        'https://www.indeed.com/', 'Software', 'Chicago, IL')
     df_Chicago = Scraper.scrape_job_details(current_url)
+
+    current_url = Scraper.scrape_url_indeed(
+        'https://www.indeed.com/', 'Software', 'New York')
+    df_New_York = Scraper.scrape_job_details(current_url)
+
+    current_url = Scraper.scrape_url_indeed(
+        'https://www.indeed.com/', 'Software', 'San Francisco')
+    df_San_Francisco = Scraper.scrape_job_details(current_url)
+
+    current_url = Scraper.scrape_url_indeed(
+        'https://www.indeed.com/', 'Software', 'Los Angeles')
+    df_Los_Angeles = Scraper.scrape_job_details(current_url)
+
+    current_url = Scraper.scrape_url_indeed(
+        'https://www.indeed.com/', 'Software', 'Miami, FL')
+    df_Miami = Scraper.scrape_job_details(current_url)
+
+    current_url = Scraper.scrape_url_indeed(
+        'https://www.indeed.com/', 'Software', 'San Diego')
+    df_San_Diego = Scraper.scrape_job_details(current_url)
 
     print(df_Seattle)
     print(df_Portland)
     print(df_Chicago)
+    print(df_New_York)
+    print(df_San_Francisco)
+    print(df_Los_Angeles)
+    print(df_Miami)
+    print(df_San_Diego)
