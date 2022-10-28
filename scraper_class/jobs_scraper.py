@@ -39,7 +39,7 @@ class Scraper:
                             '//*[@id="text-input-what"]').send_keys(job_title)
         time.sleep(3)
         where = driver.find_element('xpath',
-                            '//*[@id="text-input-where"]')
+                                    '//*[@id="text-input-where"]')
 
         time.sleep(6)
         where.send_keys(Keys.BACK_SPACE)
@@ -103,9 +103,10 @@ class Scraper:
                     "location": post.select('.companyLocation')[0].get_text().strip(),
                     "date": post.select('.date')[0].get_text().strip(),
                     "job_desc": post.select('.job-snippet')[0].get_text().strip(),
-                    "url": post.select(".jcs-JobTitle")[0].get("href")
+                    "url": ""
 
                 }
+            # post.select(".jcs-JobTitle")[0].get("href")
             except IndexError:
                 continue
             jobs_list.append(data)
@@ -127,7 +128,6 @@ class Scraper:
 
             return res.text
 
-
     def load_csv():
         us_cities = []
         file = open('us_cities.csv')
@@ -145,4 +145,3 @@ if __name__ == "__main__":
             'https://www.indeed.com/', 'Software', city)
         df_ = s.scrape_job_details(current_url)
         print(df_)
-
