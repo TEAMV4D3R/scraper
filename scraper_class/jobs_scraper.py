@@ -92,9 +92,7 @@ class Scraper:
         jobs_list = []
         for post in content.select('.job_seen_beacon'):
             # print("post start here ====>>   ", post)
-            l = post.select(".jcs-JobTitle")[0].get("href")
 
-            print("post", l)
             try:
                 data = {
                     "job_title": post.select('.jobTitle')[0].get_text().strip(),
