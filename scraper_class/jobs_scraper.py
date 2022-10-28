@@ -39,7 +39,7 @@ class Scraper:
                             '//*[@id="text-input-what"]').send_keys(job_title)
         time.sleep(3)
         where = driver.find_element('xpath',
-                            '//*[@id="text-input-where"]')
+                                    '//*[@id="text-input-where"]')
 
         time.sleep(6)
         where.send_keys(Keys.BACK_SPACE)
@@ -128,7 +128,6 @@ class Scraper:
 
             return res.text
 
-
     def load_csv():
         us_cities = []
         file = open('us_cities.csv')
@@ -146,4 +145,3 @@ if __name__ == "__main__":
             'https://www.indeed.com/', 'Software', city)
         df_ = s.scrape_job_details(current_url)
         print(df_)
-
