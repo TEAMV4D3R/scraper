@@ -69,6 +69,7 @@ class Scraper:
                                 '//*[@id="whatWhereFormId"]/div[3]/button').click()
 
         current_url = driver.current_url
+        print("****Extracted Jobs*****")
 
         return current_url
 
@@ -89,9 +90,10 @@ class Scraper:
 
         driver.close()
 
+        print("****Scraped Jobs*****")
+
         jobs_list = []
         for post in content.select('.job_seen_beacon'):
-            # print("post start here ====>>   ", post)
 
             try:
                 data = {
@@ -122,13 +124,17 @@ class Scraper:
             url = 'https://allscrapedjobs.herokuapp.com/api/v1/scraped_jobs/'
 
             res = requests.post(url, json=scraped_data)
+            print("****Jobs Posted****")
             time.sleep(3)
 
             return res.text
 
     def load_csv():
         us_cities = []
-        file = open('us_cities.csv')
+        try:
+            file = open('../us_cities.csv')
+        except:
+            file = open('./us_cities.csv')
         csvreader = csv.reader(file)
         for row in csvreader:
             us_cities.append(" ".join(row))
