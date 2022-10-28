@@ -103,9 +103,10 @@ class Scraper:
                     "location": post.select('.companyLocation')[0].get_text().strip(),
                     "date": post.select('.date')[0].get_text().strip(),
                     "job_desc": post.select('.job-snippet')[0].get_text().strip(),
-                    "url": post.select(".jcs-JobTitle")[0].get("href")
+                    "url": ""
 
                 }
+            # post.select(".jcs-JobTitle")[0].get("href")
             except IndexError:
                 continue
             jobs_list.append(data)
